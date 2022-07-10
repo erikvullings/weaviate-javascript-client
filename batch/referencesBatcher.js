@@ -11,6 +11,11 @@ export default class ReferencesBatcher {
     return this;
   };
 
+  withReferences = (obj) => {
+    this.references = obj;
+    return this;
+  };
+
   payload = () => this.references;
 
   validateReferenceCount = () => {
@@ -35,16 +40,17 @@ export default class ReferencesBatcher {
       );
     }
     const path = `/batch/references`;
-    const payloadPromise = Promise.all(this.references.map(ref => this.rebuildReferencePromise(ref)));
+    const payloadPromise = Promise.all(
+      this.references.map((ref) => this.rebuildReferencePromise(ref))
+    );
 
-    return payloadPromise.then(payload => this.client.post(path, payload));
+    return payloadPromise.then((payload) => this.client.post(path, payload));
   };
 
   rebuildReferencePromise(reference) {
-    return this.beaconPath.rebuild(reference.to)
-      .then(beaconTo => ({
-        from: reference.from,
-        to: beaconTo
-      }));
+    return this.beaconPath.rebuild(reference.to).then((beaconTo) => ({
+      from: reference.from,
+      to: beaconTo,
+    }));
   }
 }
